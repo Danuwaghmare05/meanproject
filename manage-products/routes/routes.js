@@ -52,4 +52,44 @@ router.delete("/product/:id", (req, res, next) => {
   });
 });
 
+// update product
+router.put("/product/:id", (req, res, next) => {
+  console.log("req", req.body);
+  // logic to update product
+
+  Product.findOne({ _id: req.params.id }, function (err, product) {
+    if (err) {
+      res.json(err);
+    } else {
+      product.prodId = req.body.prodId;
+      product.prodName = req.body.prodName;
+      product.price = req.body.price;
+
+      product.save((err, product) => {
+        console.log("findOne->save(): product : ", product);
+        if (err) {
+          res.json({ msg: "Failed to update Product" });
+        } else {
+          //  'msg' for api testing
+          //  res.json({ msg: "Product updated successfully...!" });
+
+          // or
+
+          // res updated product with '_id'
+          res.json(product);
+
+          // or
+
+          // fetch all records for new updates
+          // Product.find(function (err, products) {
+          //   if (err) console.log("routes.js: err to 'find()' products : ", err);
+          //   res.json(products);
+          // });
+        }
+      });
+      // res.json(product);
+    }
+  });
+});
+
 module.exports = router;

@@ -13,6 +13,9 @@ export class ProductsComponent implements OnInit {
   prodId: String;
   prodName: String;
   price: String;
+  index: any;
+  op: boolean;
+  private _id: any;
 
   constructor(private productsService: ProductsService) {}
 
@@ -24,6 +27,7 @@ export class ProductsComponent implements OnInit {
     });
   }
 
+  //add product
   addProduct() {
     const newProduct = {
       prodId: this.prodId,
@@ -31,11 +35,76 @@ export class ProductsComponent implements OnInit {
       price: this.price,
     };
     this.productsService.addProduct(newProduct).subscribe((product) => {
-      console.log('productsComponent -> addProduct -> product', product);
-      this.products.push(product);
-      this.productsService
-        .getProducts()
-        .subscribe((products) => (this.products = products));
+      console.log(' addProduct -> product : ', product);
+
+      // this.products.push(product); // add new product to last index
+
+      // or
+
+      this.products.splice(0, 0, product); // add new product to first index
+
+      // or
+
+      // this.products = product; // if all records
+
+      // or
+
+      // this.productsService.getProducts().subscribe((products) => {
+      //   console.log('products - ', products);
+
+      //   this.products = products;
+      // });
+
+      this.prodId = '';
+      this.prodName = '';
+      this.price = '';
     });
+  }
+
+  //delete product
+  deleteProduct(product) {
+    // var products = this.products;
+    this.productsService.deleteProduct(product._id).subscribe((data) => {
+      console.log(' data', data);
+      console.log('_id : ' + product._id);
+      var index = this.products.indexOf(product);
+
+      console.log('deleteProduct -> index  =', index);
+
+      this.products.splice(index, 1);
+    });
+  }
+
+  //edit and update product
+  editProduct(product) {
+    this.op = false;
+    this.index = this.products.indexOf(product);
+    this._id = product._id;
+    this.prodId = product.prodId;
+    this.prodName = product.prodName;
+    this.price = product.price;
+  }
+
+  updateProduct() {
+    this.op = true;
+    console.log(' index : ', this.index);
+
+    const newProduct = {
+      prodId: this.prodId,
+      prodName: this.prodName,
+      price: this.price,
+    };
+    console.log('newProduct', newProduct);
+    console.log('this._id ', this._id);
+
+    this.productsService
+      .updateProduct(this._id, newProduct)
+      .subscribe((product) => {
+        console.log(' putProduct -> product : ', product);
+        this.products.splice(this.index, 1, product);
+      });
+    this.prodId = '';
+    this.prodName = '';
+    this.price = '';
   }
 }
